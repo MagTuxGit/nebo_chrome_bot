@@ -1,18 +1,25 @@
+window.onload = function() {
+	readStorageAndRun();
+}
+
 // helpers
+const baseUrl = 'https://nebo.mobi/';
+
 const textGetMoney = "Собрать выручку!";
 const textGetGoods = "Закупить товар";
 const textBuyItem = "Закупить за ";
 const textPutGoods = "Выложить товар";
 const textLiftUp = "Поднять лифт на ";
 const textGetTips = "Получить чаевые";
+const textLiftAvailable = "Поднять на лифте";
 
 const pages = {
 	home: 'home',
 	floor: 'floor',
 	lift: 'lift',
-	getMoney: 'getMoney',
-	putGoods: 'putGoods',
-	getGoods: 'getGoods'
+	getMoney: 'floors/0/5',
+	putGoods: 'floors/0/3',
+	getGoods: 'floors/0/2'
 }
 
 const pagesLinks = {
@@ -27,8 +34,11 @@ const pagesLinks = {
 const steps = {
 	start: 'start',
 	pause: 'pause',
+	goGetMoney: 'goGetMoney',
 	getMoney: 'getMoney',
+	goPutGoods: 'goPutGoods',
 	putGoods: 'putGoods',
+	goGetGoods: 'goGetGoods',
 	getGoods: 'getGoods',
 	buyItem: 'buyItem',
 	liftUp: 'liftUp'
@@ -49,19 +59,16 @@ function setNextStep(step) { chrome.storage.local.set({'nextStep': step}); }
 function pause() {
 	console.log('PAUSE 30 sec'); 
 	setNextStep(steps.start);
-	setTimeout(run, 30000);
+	setTimeout(goHome, 30000);
 }
 
 // RUN
-window.onload = function() {
-	setCurrentPage();
-	readStorageAndRun();
-}
-
 var currentPage = pages.home;
 var nextStep
 
 function readStorageAndRun() {
+	setCurrentPage();
+
 	chrome.storage.local.get('nextStep', function(result){
 		nextStep = result.nextStep;
 		console.log("STORAGE " + nextStep);
@@ -80,6 +87,19 @@ function setCurrentPage() {
 }
 
 function run() {
+	if (!checkLink(pages.getMoney) && 
+	!checkLink(pages.putGoods) && 
+	!checkLink(pages.getGoods) && 
+	!checkText(textLiftAvailable) && 
+	nextStep != steps.getGoods && 
+	nextStep != steps.liftUp) {
+		nextStep = steps.pause;
+	}
+
+	if (nextStep != steps.getMoney && checkLink(pages.getMoney)) { nextStep = steps.goGetMoney; }
+	else if (nextStep != steps.putGoods && checkLink(pages.putGoods)) { nextStep = steps.goPutGoods; }
+	else if (nextStep != steps.getGoods && checkLink(pages.getGoods)) { nextStep = steps.goGetGoods; }
+
 	if (nextStep == steps.getGoods) {
 		if (currentPage == pages.floor) {
 			nextStep = steps.buyItem;
@@ -97,27 +117,42 @@ function run() {
 			setNextStep(steps.start);
 			goHome();
 			break;
-		case steps.start:
-			console.log("STEP START");
-			setNextStep(steps.getMoney);
-			goUrl('https://nebo.mobi/floors/0/5');
-			break;
 		case steps.pause:
 			pause();
+			break;
+		case steps.start:
+			console.log("STEP START");
+			setNextStep(steps.goGetMoney);
+			goHome();
+			break;
+		case steps.goGetMoney:
+			console.log("STEP GO GET MONEY");
+			setNextStep(steps.getMoney);
+			goUrl('https://nebo.mobi/floors/0/5');
 			break;
 		case steps.getMoney:
 			console.log("STEP MONEY");
 			if (!getMoney()) { 
-				setNextStep(steps.putGoods);
-				goUrl('https://nebo.mobi/floors/0/3');		
+				setNextStep(steps.goPutGoods);
+				goHome();
 			}
+			break;
+		case steps.goPutGoods:
+			console.log("STEP GO PUT GOODS");
+			setNextStep(steps.putGoods);
+			goUrl('https://nebo.mobi/floors/0/3');		
 			break;
 		case steps.putGoods:
 			console.log("STEP PUT GOODS");
 			if (!putGoods()) { 
-				setNextStep(steps.getGoods);
-				goUrl('https://nebo.mobi/floors/0/2');		
+				setNextStep(steps.goGetGoods);
+				goHome();
 			}
+			break;
+		case steps.goGetGoods:
+			console.log("STEP GO GET GOODS");
+			setNextStep(steps.getGoods);
+			goUrl('https://nebo.mobi/floors/0/2');		
 			break;
 		case steps.getGoods:
 			console.log("STEP GET GOODS");
@@ -155,6 +190,17 @@ function clickFirstLink(text) {
 	function itemContainsText(item) { return item.textContent.includes(text); }
 	const link = Array.from(document.links).filter(itemContainsText)[0];
 	return go(link)
+}
+
+function checkLink(url) {
+	var els = document.querySelector('a[href*="'+url+'"]');
+	return els != null
+}
+
+function checkText(text) {
+	function itemContainsText(item) { return item.textContent.includes(text); }
+	const link = Array.from(document.links).filter(itemContainsText)[0];
+	return link != null;	
 }
 
 function getMoney() { return clickFirstLink(textGetMoney); }
