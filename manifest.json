@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+
+  "name": "Scyscrapers",
+  "description": "Scyscrapers bot",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": ["https://nebo.mobi/*"],
+      "js": ["play.js"]
+    }
+  ]
+}
