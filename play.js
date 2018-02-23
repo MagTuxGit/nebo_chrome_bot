@@ -54,6 +54,7 @@ const steps = {
 	getFloors: 'getFloors',	// get floors
 	checkJobs: 'checkJobs',	// check jobs
 
+	goHome: 'goHome',
 	pause: 'pause',
 	start: 'start',			// start after pause
 
@@ -219,6 +220,7 @@ function run() {
 				}
 			}
 			break;
+		case steps.goHome:
 		default:
 			console.log("STEP DEFAULT");
 			setNextStep(steps.start);
@@ -328,4 +330,8 @@ function getGoods() { return clickFirstLink(textGetGoods); }
 function buyItem() { return clickFirstLink(textBuyItem); }
 function putGoods() { return clickFirstLink(textPutGoods); }
 function liftUp() { return clickFirstLink(textLiftUp); }
-function getTips() { return clickFirstLink(textGetTips); }
+function getTips() { 
+	var vip = document.querySelector("div.lift span.ctrl span.vip");
+	if (vip) { setNextStep(steps.start); }
+	return clickFirstLink(textGetTips); 
+}
