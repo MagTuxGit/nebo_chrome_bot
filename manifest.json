@@ -7,7 +7,7 @@
   "content_scripts": [
     {
       "matches": ["https://nebo.mobi/*"],
-      "js": ["jquery-3.3.1.min.js", "play.js"],
+      "js": ["play.js"],
       "run_at": "document_end"
     }
   ],
