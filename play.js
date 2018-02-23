@@ -292,6 +292,7 @@ function getFloors() {
 }
 
 function checkJobs() {
+	// finish me
 	setNextStep(steps.start);
 	goHome();
 }
@@ -327,7 +328,3 @@ function buyItem() { return clickFirstLink(textBuyItem); }
 function putGoods() { return clickFirstLink(textPutGoods); }
 function liftUp() { return clickFirstLink(textLiftUp); }
 function getTips() { return clickFirstLink(textGetTips); }
-
-function checkLift() {
-	window.location = "https://nebo.mobi/lift";
-}
