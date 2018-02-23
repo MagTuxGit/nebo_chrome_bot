@@ -332,6 +332,6 @@ function putGoods() { return clickFirstLink(textPutGoods); }
 function liftUp() { return clickFirstLink(textLiftUp); }
 function getTips() { 
 	var vip = document.querySelector("div.lift span.ctrl span.vip");
-	if (vip) { setNextStep(steps.start); }
+	if (vip) { setNextStep(steps.goHome); }
 	return clickFirstLink(textGetTips); 
 }
