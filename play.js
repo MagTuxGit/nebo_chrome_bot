@@ -16,6 +16,7 @@ const textGetTips = "Получить чаевые";
 const textLiftAvailable = "Поднять на лифте";
 const textHotel = "1. Гостиница";
 const textShowFloors = "Показать этажи";
+const textHideFloors = "свернуть этажи";
 const textShowPeople = "Раскрыть список";
 
 const pages = {
@@ -288,7 +289,7 @@ function getFloors() {
 	})
 	saveFloors();
 	setNextStep(steps.checkJobs);
-	goHome();
+	clickFirstLink(textHideFloors);
 }
 
 function checkJobs() {
